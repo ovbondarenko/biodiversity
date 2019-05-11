@@ -33,90 +33,57 @@ function buildMetadata(sample) {
 
 function buildCharts(sample) {
 
-  var url = `http://127.0.0.1:5000/samples/${sample}`;
+  var sampleUrl = `http://127.0.0.1:5000/samples/${sample}`;
 
-  // @TODO: Use `d3.json` to fetch the sample data for the plots
-  var data_sorted = d3.json(url).then(function(data) {
-    data = [data];
-    // console.log(data);
-    var ids = data[0].otu_ids;
-    var labels = data[0].otu_labels;
-    var values = data[0].sample_values;
-    var sample_data = ids.map(function(x, i) {
-      return d = {"sample_id": x, 
-              "sample_label": labels[i], 
-              "sample_value": values[i]};
-    });
+  // Fetch the sample data from sampleUrl
 
-    // console.log(d);
+  d3.json(sampleUrl).then(d => {
 
-    var data_sorted = sample_data.sort((a,b) => parseFloat(a.sample_value)-parseFloat(b.sample_value));
-    var top_ten = data_sorted.slice(-10);
-    // console.log(data_sorted, top_ten);
-    return data_sorted;
-  });
-
-  // console.log(data_sorted);
-
-  var bubbleChart=function(data_sorted) {
-    console.log(data_sorted["sample_id"]);
-
+    // Build a bubble chart for all samples
     var trace1 = {
-      x: [1, 2, 3, 4],
-      y: [10, 11, 12, 13],
+      x: d.otu_ids,
+      y: d.sample_values,
+      text: d.otu_labels,
       mode: 'markers',
       marker: {
-        color: ['rgb(93, 164, 214)', 'rgb(255, 144, 14)',  'rgb(44, 160, 101)', 'rgb(255, 65, 54)'],
-        opacity: [1, 0.8, 0.6, 0.4],
-        size: [40, 60, 80, 100]
+        color: d.otu_ids,
+        opacity: 0.5,
+        size: d.sample_values
       }
     };
     
     var data = [trace1];
     
     var layout = {
-      title: 'Marker Size and Color',
-      showlegend: false,
-      height: 600,
-      width: 600
+      
+      height: 500,
+      width: 1000
     };
     
     Plotly.newPlot('bubble', data, layout);
-  }
-  bubbleChart(data_sorted)
+    
+    
+    // Create a pie chart for top ten samples
+
+    var trace2 = {
+      values: d.sample_values.slice(0,10),
+      labels: d.otu_ids.slice(0,10),
+      type: 'pie',
+      hovertext: d.otu_labels.slice(0,10)
+    }
+
+    var data2 = [trace2]
+
+    var layout2 = {
+      width: 500,
+      height: 500
+    }
+
+    Plotly.newPlot('pie', data2, layout2);
+
+  });
+
 };
-    // @TODO: Build a Bubble Chart using the sample data
-
-    // var data = [{
-    //   x: x,
-    //   y: y,
-    //   text: text,
-    //   mode: 'markers',
-    //   marker: {
-    //     color: color,
-    //     colorscale: 'Bluered',
-    //     size: y
-    //   }
-    // }];
- 
-    // var layout = {
-    //   width: 600,
-    //   height: 600
-    // };
-    // Plotly.newPlot('bubble', data, layout);
-
-    // // @TODO: Build a Pie Chart
-
-    // d3.json("/").then(function(data){
-    //   var layout = {
-    //     "title": "Top ten bacteria strains"
-    //   }
-      
-    // Plotly.plot("pie", data, layout);
-    // })
-    // HINT: You will need to use slice() to grab the top 10 sample_values,
-    // otu_ids, and labels (10 each).
-
 
 function init() {
   // Grab a reference to the dropdown select element
