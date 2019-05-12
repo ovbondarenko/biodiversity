@@ -1,4 +1,8 @@
+import os
+ 
 import pandas as pd
+import numpy as np
+
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -6,6 +10,7 @@ from sqlalchemy import create_engine
 
 from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
 
@@ -15,7 +20,6 @@ app = Flask(__name__)
 #################################################
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/bellybutton.sqlite"
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 db = SQLAlchemy(app)
 
@@ -98,10 +102,10 @@ if __name__ == "__main__":
     app.run()
 
 # prevent cached responses
-if app.config["DEBUG"]:
-    @app.after_request
-    def after_request(response):
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
-        response.headers["Expires"] = 0
-        response.headers["Pragma"] = "no-cache"
-        return response
+# if app.config["DEBUG"]:
+#     @app.after_request
+#     def after_request(response):
+#         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
+#         response.headers["Expires"] = 0
+#         response.headers["Pragma"] = "no-cache"
+#         return response
